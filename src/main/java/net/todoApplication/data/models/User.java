@@ -18,9 +18,9 @@ import java.util.Date;
 @Document(collection = "users")
 public class User {
     @Id
-    private String id;
+    private String userId;
 
-    private String username;
+    private String userName;
 
     @Indexed(unique = true)
     private String email;

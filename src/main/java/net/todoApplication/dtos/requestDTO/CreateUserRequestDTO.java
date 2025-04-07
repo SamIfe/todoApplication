@@ -1,4 +1,4 @@
-package net.todoApplication.dtos;
+package net.todoApplication.dtos.requestDTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDTO {
+public class CreateUserRequestDTO {
     private String id;
     private String username;
     private String email;

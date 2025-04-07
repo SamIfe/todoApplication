@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.todoApplication.data.models.User;
 import net.todoApplication.data.repositories.UserRepository;
 import net.todoApplication.exceptions.UserNotFoundException;
-import net.todoApplication.services.interfaces.AuthenticationSrvice;
+import net.todoApplication.services.interfaces.AuthenticationService;
 import net.todoApplication.services.interfaces.UserService;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final AuthenticationSrvice authenticationSrvice;
+    private final AuthenticationService authenticationSrvice;
 
     @Override
     public User register(User user) {
@@ -35,8 +35,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Optional<User> findByUserName(String userName) {
+        return userRepository.findByUserName(userName);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(()-> new UserNotFoundException("User not found"));
 
-        existingUser.setUsername(user.getUsername());
+        existingUser.setUserName(user.getUserName());
         existingUser.setPassword(user.getPassword());
 
         if(user.getPassword() != null && ! user.getPassword().isEmpty()) {
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
+    public boolean existsByUserName(String userName) {
+        return userRepository.existsByUserName(userName);
     }
 }

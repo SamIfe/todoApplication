@@ -2,7 +2,7 @@ package net.todoApplication.services.interfaces;
 
 import net.todoApplication.data.models.User;
 
-public interface AuthenticationSrvice {
+public interface AuthenticationService {
 
     String generateToken(User user);
     boolean verifyToken(String token);

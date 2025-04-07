@@ -5,7 +5,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import net.todoApplication.data.models.User;
-import net.todoApplication.services.interfaces.AuthenticationSrvice;
+import net.todoApplication.services.interfaces.AuthenticationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,12 @@ import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationServiceImpl implements AuthenticationSrvice {
+public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.secret}")
+    @Value("${jwt.expiration}")
     private Long expiration;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -32,7 +33,7 @@ public class AuthenticationServiceImpl implements AuthenticationSrvice {
     @Override
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId());
+        claims.put("userId", user.getUserId());
         claims.put("email", user.getEmail());
         claims.put("isAdmin", user.isAdmin());
 
