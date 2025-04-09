@@ -2,8 +2,10 @@ package net.todoApplication.controllers;
 
 import lombok.RequiredArgsConstructor;
 import net.todoApplication.data.models.Todo;
+import net.todoApplication.data.models.User;
 import net.todoApplication.dtos.TodoDTO;
 import net.todoApplication.services.interfaces.TodoService;
+import net.todoApplication.services.interfaces.UserService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class TodoController {
 
     private final TodoService todoService;
+    private final UserService userService;
 
     @PostMapping
     public ResponseEntity<TodoDTO> createTodo(@RequestBody TodoDTO todoDTO) {
@@ -122,6 +125,8 @@ public class TodoController {
     }
 
     private String getUserIdFromEmail(String email) {
-        return "user-id";
+        return userService.findByEmail(email)
+                .map(User::getUserId)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
     }
 }

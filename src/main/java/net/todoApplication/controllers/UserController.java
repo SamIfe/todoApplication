@@ -2,7 +2,7 @@ package net.todoApplication.controllers;
 
 import lombok.RequiredArgsConstructor;
 import net.todoApplication.data.models.User;
-import net.todoApplication.dtos.requestDTO.CreateUserRequestDTO;
+import net.todoApplication.dtos.requestDTO.CreateUserRequest;
 import net.todoApplication.services.interfaces.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,8 +20,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<CreateUserRequestDTO>> getAllUsers() {
-        List<CreateUserRequestDTO> users = userService.findAll().stream()
+    public ResponseEntity<List<CreateUserRequest>> getAllUsers() {
+        List<CreateUserRequest> users = userService.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
 
@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CreateUserRequestDTO> getUserById(@PathVariable String id) {
+    public ResponseEntity<CreateUserRequest> getUserById(@PathVariable String id) {
         return userService.findById(id)
                 .map(this::convertToDTO)
                 .map(ResponseEntity::ok)
@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<CreateUserRequestDTO> getCurrentUser() {
+    public ResponseEntity<CreateUserRequest> getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
 
@@ -48,8 +48,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CreateUserRequestDTO> updateUser(@PathVariable String id, @RequestBody CreateUserRequestDTO createUserRequestDTO) {
-        User user = convertToEntity(createUserRequestDTO);
+    public ResponseEntity<CreateUserRequest> updateUser(@PathVariable String id, @RequestBody CreateUserRequest createUserRequest) {
+        User user = convertToEntity(createUserRequest);
         User updatedUser = userService.update(id, user);
         return ResponseEntity.ok(convertToDTO(updatedUser));
     }
@@ -60,23 +60,18 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    private CreateUserRequestDTO convertToDTO(User user) {
-        return CreateUserRequestDTO.builder()
-                .id(user.getUserId())
+    private CreateUserRequest convertToDTO(User user) {
+        return CreateUserRequest.builder()
                 .username(user.getUserName())
                 .email(user.getEmail())
-                .isAdmin(user.isAdmin())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 
-    private User convertToEntity(CreateUserRequestDTO createUserRequestDTO) {
+    private User convertToEntity(CreateUserRequest createUserRequest) {
         return User.builder()
-                .userId(createUserRequestDTO.getId())
-                .userName(createUserRequestDTO.getUsername())
-                .email(createUserRequestDTO.getEmail())
-                .isAdmin(createUserRequestDTO.isAdmin())
+                .userName(createUserRequest.getUsername())
+                .email(createUserRequest.getEmail())
+                .password(createUserRequest.getPassword())
                 .build();
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Builder
@@ -28,10 +29,10 @@ public class User {
     private String password;
 
     @CreatedDate
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     private boolean isAdmin;
 }

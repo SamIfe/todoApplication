@@ -2,8 +2,11 @@ package net.todoApplication.controllers;
 
 import lombok.RequiredArgsConstructor;
 import net.todoApplication.data.models.Category;
+import net.todoApplication.data.models.User;
 import net.todoApplication.dtos.CategoryDTO;
 import net.todoApplication.services.interfaces.CategoryService;
+import net.todoApplication.services.interfaces.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,8 +20,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
-
+    @Autowired
     private final CategoryService categoryService;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping
     public ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO categoryDTO) {
@@ -85,7 +91,7 @@ public class CategoryController {
 
     private Category convertToEntity(CategoryDTO categoryDTO) {
         return Category.builder()
-                .id(categoryDTO.getId())
+                .userId(categoryDTO.getUserId())
                 .name(categoryDTO.getName())
                 .color(categoryDTO.getColor())
                 .userId(categoryDTO.getUserId())
@@ -93,6 +99,8 @@ public class CategoryController {
     }
 
     private String getUserIdFromEmail(String email) {
-        return "user-id";
+        return userService.findByEmail(email)
+                .map(User::getUserId)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
     }
 }

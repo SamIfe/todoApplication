@@ -7,6 +7,6 @@ public interface AuthenticationService {
     String generateToken(User user);
     boolean verifyToken(String token);
     String getUserIdFromToken(String token);
-    String hashPassword(String password);
+   String hashPassword(String password);
     boolean comparePassword(String password, String hash);
 }

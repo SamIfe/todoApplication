@@ -1,10 +1,10 @@
 package net.todoApplication.controllers;
 
 import lombok.RequiredArgsConstructor;
-import net.todoApplication.data.models.User;
-import net.todoApplication.dtos.requestDTO.CreateUserRequestDTO;
-import net.todoApplication.dtos.requestDTO.AuthRequestDTO;
-import net.todoApplication.dtos.responseDTO.AuthResponseDTO;
+import net.todoApplication.dtos.requestDTO.CreateUserRequest;
+import net.todoApplication.dtos.requestDTO.AuthRequest;
+import net.todoApplication.dtos.responseDTO.AuthResponse;
+import net.todoApplication.dtos.responseDTO.CreateUserResponse;
 import net.todoApplication.services.interfaces.AuthenticationService;
 import net.todoApplication.services.interfaces.UserService;
 import org.springframework.http.HttpStatus;
@@ -23,40 +23,22 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody CreateUserRequestDTO createUserRequestDTO) {
-        if (userService.existsByEmail(createUserRequestDTO.getEmail())) {
+    public ResponseEntity<?> register(@RequestBody CreateUserRequest createUserRequest) {
+        if (userService.existsByEmail(createUserRequest.getEmail())) {
             return ResponseEntity.badRequest()
                     .body("User already exist");
         }
-
-        User user = User.builder()
-                .userName(createUserRequestDTO.getUsername())
-                .email(createUserRequestDTO.getEmail())
-                .password(createUserRequestDTO.getPassword())
-                .isAdmin(false)
-                .build();
-
-        User registeredUser = userService.register(user);
-
-        CreateUserRequestDTO responseUser = CreateUserRequestDTO.builder()
-                .id(registeredUser.getUserId())
-                .username(registeredUser.getUserName())
-                .email(registeredUser.getEmail())
-                .isAdmin(registeredUser.isAdmin())
-                .createdAt(registeredUser.getCreatedAt())
-                .updatedAt(registeredUser.getUpdatedAt())
-                .build();
-
-        return new ResponseEntity<>(responseUser, HttpStatus.CREATED);
+        CreateUserResponse response = userService.registerUser(createUserRequest);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequestDTO authRequest) {
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
         return userService.findByEmail(authRequest.getEmail())
                 .filter(user -> authenticationService.comparePassword(authRequest.getPassword(), user.getPassword()))
                 .map(user -> {
                     String token = authenticationService.generateToken(user);
-                    return ResponseEntity.ok(new AuthResponseDTO(token));
+                    return ResponseEntity.ok(new AuthResponse(token));
                 })
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }

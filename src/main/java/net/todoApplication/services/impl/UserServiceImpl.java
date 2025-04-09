@@ -3,9 +3,13 @@ package net.todoApplication.services.impl;
 import lombok.RequiredArgsConstructor;
 import net.todoApplication.data.models.User;
 import net.todoApplication.data.repositories.UserRepository;
+import net.todoApplication.dtos.requestDTO.CreateUserRequest;
+import net.todoApplication.dtos.responseDTO.CreateUserResponse;
+import net.todoApplication.exceptions.UserAlreadyExistException;
 import net.todoApplication.exceptions.UserNotFoundException;
 import net.todoApplication.services.interfaces.AuthenticationService;
 import net.todoApplication.services.interfaces.UserService;
+import net.todoApplication.utils.UserMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +20,18 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final AuthenticationService authenticationSrvice;
+    private final AuthenticationService authenticationService;
 
     @Override
-    public User register(User user) {
-        user.setPassword(authenticationSrvice.hashPassword(user.getPassword()));
-        return userRepository.save(user);
+    public CreateUserResponse registerUser(CreateUserRequest registerUser) {
+        if(userExist(registerUser.getEmail())){
+            throw new UserAlreadyExistException("User already exist");
+        }
+
+        User newUser = UserMapper.mapRequestToUser(registerUser);
+        newUser.setPassword(authenticationService.hashPassword(registerUser.getPassword()));
+        userRepository.save(newUser);
+        return UserMapper.mapResponseToUser(newUser);
     }
 
     @Override
@@ -53,7 +63,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setPassword(user.getPassword());
 
         if(user.getPassword() != null && ! user.getPassword().isEmpty()) {
-            existingUser.setPassword(authenticationSrvice.hashPassword(user.getPassword()));
+            existingUser.setPassword(authenticationService.hashPassword(user.getPassword()));
 
         }
         return userRepository.save(existingUser);
@@ -77,5 +87,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByUserName(String userName) {
         return userRepository.existsByUserName(userName);
+    }
+
+
+    private boolean userExist(String email){
+        return userRepository.existsByEmail(email);
     }
 }

@@ -1,7 +1,9 @@
 package net.todoApplication.controllers;
 
 import lombok.RequiredArgsConstructor;
+import net.todoApplication.data.models.User;
 import net.todoApplication.services.interfaces.ReportService;
+import net.todoApplication.services.interfaces.UserService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,6 +23,7 @@ public class ReportController {
 
 
     private final ReportService reportService;
+    private final UserService userService;
 
     @GetMapping("/user-activity")
     public ResponseEntity<Map<String, Object>> getUserActivityReport(
@@ -69,7 +72,9 @@ public class ReportController {
     }
 
     private String getUserIdFromEmail(String email) {
-        return "user-id";
+        return userService.findByEmail(email)
+                .map(User::getUserId)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
     }
 }
 

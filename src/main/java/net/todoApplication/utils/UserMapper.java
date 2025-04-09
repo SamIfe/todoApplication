@@ -1,28 +1,39 @@
-//package net.todoApplication.utils;
-//
-//import net.todoApplication.data.models.User;
-//import net.todoApplication.dtos.requestDTO.CreateUserRequestDTO;
-//import net.todoApplication.dtos.responseDTO.CreateUserResponseDTO;
-//
-//public class UserMapper {
-//    public static void mapRequestToUser(CreateUserRequestDTO userRequestDTO){
-//        User newUser = User.builder()
-//                .userName(userRequestDTO.getUsername())
-//                .email(userRequestDTO.getEmail())
-//                .password(userRequestDTO.getPassword())
-//                .isAdmin(false)
-//                .build();
-//    }
-//
-//    public static CreateUserResponseDTO mapToResponse(CreateUserRequestDTO userRequestDTO){
-//        CreateUserResponseDTO userResponse = new CreateUserResponseDTO()
-//                userResponse.userId(userRequestDTO.getId())
-//                .userName(userRequestDTO.getUsername())
-//                .email(userRequestDTO.getEmail())
-//                .isAdmin(false)
-//                .createdAt(userRequestDTO.getCreatedAt())
-//                .updatedAt(userRequestDTO.getUpdatedAt())
-//                .build();
-//        return userResponse;
-//    }
-//}
+package net.todoApplication.utils;
+
+import lombok.AllArgsConstructor;
+import net.todoApplication.data.models.User;
+import net.todoApplication.dtos.requestDTO.CreateUserRequest;
+import net.todoApplication.dtos.responseDTO.CreateUserResponse;
+import net.todoApplication.services.interfaces.AuthenticationService;
+
+import java.time.LocalDateTime;
+import java.util.Random;
+
+@AllArgsConstructor
+public class UserMapper{
+    public static User mapRequestToUser(CreateUserRequest userRequestDTO){
+        User newUser = new User();
+                newUser.setUserName(userRequestDTO.getUsername());
+                newUser.setEmail(userRequestDTO.getEmail());
+                newUser.setPassword(userRequestDTO.getPassword());
+                newUser.setCreatedAt(LocalDateTime.now());
+                newUser.setUpdatedAt(LocalDateTime.now());
+                newUser.setUserId(generateUserId());
+
+                return newUser;
+    }
+    public static CreateUserResponse mapResponseToUser(User user){
+        CreateUserResponse response = new CreateUserResponse();
+        response.setUserId(user.getUserId());
+        response.setUserName(user.getUserName());
+        response.setEmail(user.getEmail());
+        response.setCreatedAt(LocalDateTime.now());
+        response.setUpdatedAt(LocalDateTime.now());
+
+        return response;
+    }
+    private static String generateUserId(){
+        Random random = new Random();
+        return "TDA" + random.nextInt(10000) + "ATS";
+    }
+}
