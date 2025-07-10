@@ -5,9 +5,12 @@ import net.todoApplication.data.models.Category;
 import net.todoApplication.data.models.Todo;
 import net.todoApplication.data.repositories.CategoryRepository;
 import net.todoApplication.data.repositories.TodoRepository;
+import net.todoApplication.dtos.requestDTO.CreateCategoryRequest;
+import net.todoApplication.dtos.responseDTO.CreateCategoryResponse;
 import net.todoApplication.exceptions.CategoryNotFoundException;
 import net.todoApplication.exceptions.TodoTaskNotFoundException;
 import net.todoApplication.services.interfaces.CategoryService;
+import net.todoApplication.utils.CategoryMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,8 +28,10 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public Category create(Category category) {
-        return categoryRepository.save(category);
+    public CreateCategoryResponse createCategory(CreateCategoryRequest category) {
+        Category todoCategory = CategoryMapper.mapRequestToCategory(category);
+        categoryRepository.save(todoCategory);
+        return CategoryMapper.mapToCategoryResponse(todoCategory);
     }
 
     @Override

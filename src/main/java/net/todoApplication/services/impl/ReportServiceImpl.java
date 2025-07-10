@@ -93,7 +93,7 @@ public class ReportServiceImpl implements ReportService {
 
         List<String> userCategoryIds = categoryRepository.findByUserId(userId)
                 .stream()
-                .map(Category::getId)
+                .map(Category::getCategoryId)
                 .toList();
 
         Map<String, Long> todoCountByCategory = new HashMap<>();

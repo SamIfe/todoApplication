@@ -7,8 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-
+import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,14 +15,14 @@ import java.util.Date;
 @Document(collection = "categories")
 public class Category {
     @Id
-    private String id;
+    private String categoryId;
 
     private String name;
 
     private String color;
 
     @CreatedDate
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     private String userId;
 

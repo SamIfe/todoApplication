@@ -3,10 +3,10 @@ package net.todoApplication.controllers;
 import lombok.RequiredArgsConstructor;
 import net.todoApplication.data.models.Category;
 import net.todoApplication.data.models.User;
-import net.todoApplication.dtos.CategoryDTO;
+import net.todoApplication.dtos.requestDTO.CreateCategoryRequest;
+import net.todoApplication.dtos.responseDTO.CreateCategoryResponse;
 import net.todoApplication.services.interfaces.CategoryService;
 import net.todoApplication.services.interfaces.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,26 +20,22 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
-    @Autowired
     private final CategoryService categoryService;
-
-    @Autowired
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO categoryDTO) {
-        Category category = convertToEntity(categoryDTO);
-        Category createdCategory = categoryService.create(category);
-        return new ResponseEntity<>(convertToDTO(createdCategory), HttpStatus.CREATED);
+    public ResponseEntity<?> createCategory(@RequestBody CreateCategoryRequest createCategoryRequest) {
+        CreateCategoryResponse createdCategory = categoryService.createCategory(createCategoryRequest);
+        return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryDTO>> getUserCategories() {
+    public ResponseEntity<List<CreateCategoryRequest>> getUserCategories() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         org.springframework.security.core.userdetails.User user =
                 (org.springframework.security.core.userdetails.User) auth.getPrincipal();
 
-        List<CategoryDTO> categories = categoryService.findByUser(getUserIdFromEmail(user.getUsername())).stream()
+        List<CreateCategoryRequest> categories = categoryService.findByUser(getUserIdFromEmail(user.getUsername())).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
 
@@ -47,7 +43,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable String id) {
+    public ResponseEntity<CreateCategoryRequest> getCategoryById(@PathVariable String id) {
         return categoryService.findById(id)
                 .map(this::convertToDTO)
                 .map(ResponseEntity::ok)
@@ -55,8 +51,8 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable String id, @RequestBody CategoryDTO categoryDTO) {
-        Category category = convertToEntity(categoryDTO);
+    public ResponseEntity<CreateCategoryRequest> updateCategory(@PathVariable String id, @RequestBody CreateCategoryRequest createCategoryRequest) {
+        Category category = convertToEntity(createCategoryRequest);
         Category updatedCategory = categoryService.update(id, category);
         return ResponseEntity.ok(convertToDTO(updatedCategory));
     }
@@ -79,9 +75,9 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 
-    private CategoryDTO convertToDTO(Category category) {
-        return CategoryDTO.builder()
-                .id(category.getId())
+    private CreateCategoryRequest convertToDTO(Category category) {
+        return CreateCategoryRequest.builder()
+                .id(category.getCategoryId())
                 .name(category.getName())
                 .color(category.getColor())
                 .createdAt(category.getCreatedAt())
@@ -89,12 +85,12 @@ public class CategoryController {
                 .build();
     }
 
-    private Category convertToEntity(CategoryDTO categoryDTO) {
+    private Category convertToEntity(CreateCategoryRequest createCategoryRequest) {
         return Category.builder()
-                .userId(categoryDTO.getUserId())
-                .name(categoryDTO.getName())
-                .color(categoryDTO.getColor())
-                .userId(categoryDTO.getUserId())
+                .userId(createCategoryRequest.getUserId())
+                .name(createCategoryRequest.getName())
+                .color(createCategoryRequest.getColor())
+                .userId(createCategoryRequest.getUserId())
                 .build();
     }
 
