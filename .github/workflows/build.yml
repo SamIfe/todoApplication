@@ -1,11 +1,37 @@
+#name: java C22 with Maven
+#
+#on:
+#    push:
+#      branches: [ 'main', 'dev', 'prod-support']
+#    pull_request:
+#        branches: ['main,' 'dev', 'prod-support']
+#
+#
+#jobs:
+#  test:
+#    name: Unit Test
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v1
+#      - name: Set up JDK 21
+#        uses: actions/setup-java@v1
+#        with:
+#          distribution: 'temurin'
+#        java-version: 21
+#      - name: Maven Package
+#        run: mvn -B clean package -DskipTests
+#      - name: Maven Verify
+#        run: mvn -B clean verify
+#
+#
 name: java C22 with Maven
 
 on:
-    push:
-      branches: [ 'main', 'dev', 'prod-support']
-    pull_request:
-        branches: ['main,' 'dev', 'prod-support']
-
+  push:
+    branches: ['main', 'dev', 'prod-support']
+  pull_request:
+    branches: ['main', 'dev', 'prod-support']
 
 jobs:
   test:
@@ -13,15 +39,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
-      - name: Set up JDK 21
-        uses: actions/setup-java@v1
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 23
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-        java-version: 21
-      - name: Maven Package
-        run: mvn -B clean package -DskipTests
-      - name: Maven Verify
-        run: mvn -B clean verify
+          java-version: 23
 
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Build with Maven (skip tests)
+        run: mvn -B clean package -DskipTests
+
+      - name: Run Tests with Maven
+        run: mvn -B verify
 
